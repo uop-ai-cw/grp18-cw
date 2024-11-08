@@ -1,6 +1,5 @@
 import random as rd
 
-
 def print_fpop(f_pop):
     for indexp in f_pop:
         print(indexp)
@@ -14,26 +13,15 @@ def i_pop(size, chromosome):
 
 
 def fitness_f(individual):
-    count = 0
-    for i in range(len(individual)):
-        if i < 8 or i >= 24:
-            if individual[i] == 1:
-                count += 1
-        else:
-            if individual[i] == 0:
-                count += 1
-    return count
+    count_B = individual[:8].count(1) + individual[24:].count(1)
+    count_G = individual[8:24].count(0)
+    
+    return count_G + count_B
 
 def Roulette_wheel(pop, fitness):
     parents = []
     fitotal = sum(fitness)
     normalized = [x / fitotal for x in fitness]
-
-    """ print('normalized fitness')
-    print('________________________')
-    print_fpop(normalized)
-    print('________________________') """
-
     f_cumulative = []
     index = 0
 
@@ -42,10 +30,6 @@ def Roulette_wheel(pop, fitness):
         f_cumulative.append(index)
 
     pop_size = len(pop)
-    """ print('cumulative fitness')
-    print('________________________')
-    print_fpop(f_cumulative)
-    print('________________________') """
 
     for index2 in range(pop_size):
         rand_n = rd.uniform(0, 1)
@@ -60,7 +44,7 @@ def Roulette_wheel(pop, fitness):
 
 def mutate(chromo):
     for idx in range(len(chromo)):
-        if rd.random() < 0.1:
+        if rd.random() < 0.08:
             chromo = chromo[:idx] + [1 - chromo[idx]] + chromo[idx + 1 :]
     return chromo
 
@@ -77,7 +61,7 @@ def mating_crossover(parent_a, parent_b):
 
 def main():
     generations = 100
-    size = 10
+    size = 50
     chromosome = 32
 
     population = i_pop(size, chromosome)
@@ -106,7 +90,13 @@ def main():
 
         population = new_population
         print(list(map(fitness_f, population)))
-
+        
+    print("\n\n\nMax generations reached (or good solution found), here is the population of the final generation")
+    print("========================")
+    print(population)
+    print("========================")
+    print("individuals' fitness scores sorted ascending order")
+    print(sorted(list(map(fitness_f, population))))
 
 main()
-# Ideal solution [1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,]
+# Ideal solution [1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1]
