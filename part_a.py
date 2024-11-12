@@ -76,7 +76,6 @@ def main():
     population = i_pop(size, chromosome)
 
     for generation in range(generations):
-        print("Current generation: ", generation)
 
         fitness_arr = list(map(fitness_f, population))
         sorted_fitness = sorted(fitness_arr)
@@ -99,10 +98,10 @@ def main():
 
         population = new_population
     print("Original Bit String:", bit_string)
-    print("**********************")
+    print("fitness of all 50 strings after GA ↓")
     print(list(map(fitness_f, population)))
     print("Number of Generations: ", generations)
-    print("Optimized Bit String:")#, best_bits)
+    print("Optimized Bit String:", sorted_fitness)###here we shhould display omptomied bit string
 
 main()
 # Ideal solution [1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1]
