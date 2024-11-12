@@ -12,11 +12,17 @@ def i_pop(size, chromosome):
     return pop
 
 
-def fitness_f(individual):
-    count_B = individual[:8].count(1) + individual[24:].count(1)
-    count_G = individual[8:24].count(0)
-    
-    return count_G + count_B
+def fitness_f(bits):
+    B1 = bits[:8]
+    B2 = bits[24:]
+    G1 = bits[16:24]
+    G2 = bits[8:16]
+    count_B1 = B1.count(1)
+    count_B2 = B2.count(1)
+    count_G1 = G1.count(0)
+    count_G2 = G2.count(0)
+
+    return (count_B1 + count_B2) + (count_G1 + count_G2) #maximize 1s in blue and minimise green
 
 def Roulette_wheel(pop, fitness):
     parents = []
@@ -101,7 +107,7 @@ def main():
 main()
 # Ideal solution [1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1]
 
-############################################# i put second solution underneath, we can combine
+""" ############################################# i put second solution underneath, we can combine
 
 import random #for solution 2
 
@@ -138,3 +144,4 @@ print("Original Bit String:", bit_string)
 print("Number of Generations: ", g)
 print("Optimized Bit String:", best_bits)
 print("Maximized 1s in B1 B2, Minimized in G1 & G2")
+"""
