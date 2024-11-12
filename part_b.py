@@ -58,3 +58,10 @@ def ga():
 
 if __name__ == "__main__":
     ga()
+
+# words from ioannis
+
+# display its working???
+# how do we know its working correctly for every step. does it solve the problem 
+# optimise as much as possible
+# end generations if a solution we want 

@@ -1,4 +1,5 @@
 import random as rd
+bit_string = "01100111010011011101111100001111"
 
 def print_fpop(f_pop):
     for indexp in f_pop:
@@ -23,6 +24,8 @@ def fitness_f(bits):
     count_G2 = G2.count(0)
 
     return (count_B1 + count_B2) + (count_G1 + count_G2) #maximize 1s in blue and minimise green
+    
+
 
 def Roulette_wheel(pop, fitness):
     parents = []
@@ -95,53 +98,11 @@ def main():
                 new_population.extend((parent_a, parent_b))
 
         population = new_population
-        print(list(map(fitness_f, population)))
-        
-    print("\n\n\nMax generations reached (or good solution found), here is the population of the final generation")
-    print("========================")
-    print(population)
-    print("========================")
-    print("individuals' fitness scores sorted ascending order")
-    print(sorted(list(map(fitness_f, population))))
+    print("Original Bit String:", bit_string)
+    print("**********************")
+    print(list(map(fitness_f, population)))
+    print("Number of Generations: ", generations)
+    print("Optimized Bit String:")#, best_bits)
 
 main()
 # Ideal solution [1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1]
-
-""" ############################################# i put second solution underneath, we can combine
-
-import random #for solution 2
-
-bit_string = "01100111010011011101111100001111"
-
-def fitness(bits):
-    B1 = bits[:8]
-    B2 = bits[24:]
-    G1 = bits[16:24]
-    G2 = bits[8:16]
-    count_B1 = B1.count('1')
-    count_B2 = B2.count('1')
-    count_G1 = G1.count('1')
-    count_G2 = G2.count('1')
-
-    return (count_B1 + count_B2) - (count_G1 + count_G2) #maximize 1s in blue and minimise green
-
-def mutate(bits):   # GA step (mutation and crossover)
-    bits = list(bits)
-    i = random.randint(0, len(bits) - 1)
-    bits[i] = '1' if bits[i] == '0' else '0' #flip bits, if 0 then 1 if 1 then 0
-    return ''.join(bits)
-
-best_bits = bit_string       #initial bit_string as the best
-best_score = fitness(bit_string) ## valuate the score of the initial bit_string
-
-for g in range(1000):  # no of generations, exact number of generationsneeded for ideal solution
-    candidate = mutate(best_bits)   #mutated version of the current best configuration
-    score = fitness(candidate)  #evaluate fitness of mutated
-    if score > best_score: ## if better then   update the best configuration and score
-        best_bits = candidate
-        best_score = score
-print("Original Bit String:", bit_string)
-print("Number of Generations: ", g)
-print("Optimized Bit String:", best_bits)
-print("Maximized 1s in B1 B2, Minimized in G1 & G2")
-"""
