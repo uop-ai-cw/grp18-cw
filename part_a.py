@@ -135,5 +135,6 @@ for i in range(1000):  # no of generations
         best_bits = candidate
         best_score = score
 print("Original Bit String:", bit_string)
+print("Number of Generations: ", i)
 print("Optimized Bit String:", best_bits)
-print("Maximized 1s in Blue, Minimized in Green:", best_score)
+print("Maximized 1s in B1 B2, Minimized in G1 & G2")
