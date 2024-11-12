@@ -29,33 +29,9 @@ def tournament_selection(population, tournament_size=3):
     tournament = rd.sample(population, tournament_size)
     return max(tournament, key=fitness_f)
 
-def Roulette_wheel(pop, fitness):
-    parents = []
-    fitotal = sum(fitness)
-    normalized = [x / fitotal for x in fitness]
-    f_cumulative = []
-    index = 0
-
-    for n_value in normalized:
-        index += n_value
-        f_cumulative.append(index)
-
-    pop_size = len(pop)
-
-    for index2 in range(pop_size):
-        rand_n = rd.uniform(0, 1)
-        individual_n = 0
-        for fitvalue in f_cumulative:
-            if rand_n <= fitvalue:
-                parents.append(pop[individual_n])
-                break
-            individual_n += 1
-    return parents
-
-
 def mutate(chromo):
     for idx in range(len(chromo)):
-        if rd.random() < 0.1:
+        if rd.random() < 0.08:
             chromo = chromo[:idx] + [1 - chromo[idx]] + chromo[idx + 1 :]
     return chromo
 
@@ -69,28 +45,25 @@ def mating_crossover(parent_a, parent_b):
 
     return offspring
 
-
 def main():
     generations = 120
     size = 50
     chromosome = 32
 
     population = i_pop(size, chromosome)
+    no_generations = 0
 
     for generation in range(generations):
+        new_population = []
         fitness_arr = list(map(fitness_f, population))
         sorted_fitness = sorted(fitness_arr)
-        if sorted_fitness[-1] >= 32:
+        if sorted_fitness[-1] > 30:
             print("A good solution found with a fitness score of", sorted_fitness[-1], "in", generation,"generations")
             print("************")
-            print(population, '\n', fitness_arr)
+            no_generations = generation
             break
-        
-        parents = Roulette_wheel(population, fitness_arr)
-        new_population = []
 
         while len(new_population) < size:
-            # parent_a, parent_b = rd.sample(parents, 2)
             parent_a = tournament_selection(population)
             parent_b = tournament_selection(population)
             if rd.random() < 0.75:
@@ -100,6 +73,7 @@ def main():
                 new_population.extend((parent_a, parent_b))
 
         population = new_population
+        no_generations = generation
         
     fitness_all = list(map(fitness_f, population))
     best_individual = max(fitness_all) 
@@ -107,7 +81,7 @@ def main():
     print("Original Bit String:", bit_string)
     print("**********************")
     print("Fitness of each individuals in population", fitness_all)
-    print("Number of Generations: ", generations)
+    print("Number of Generations: ", no_generations)
     print("String of best individual in last generation", population[i_best_individual])
     print("Optimized Bit fitness:", best_individual)
 
