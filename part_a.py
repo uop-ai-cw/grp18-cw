@@ -128,13 +128,13 @@ def mutate(bits):   # GA step (mutation and crossover)
 best_bits = bit_string       #initial bit_string as the best
 best_score = fitness(bit_string) ## valuate the score of the initial bit_string
 
-for i in range(105):  # no of generations, exact number of generationsneeded for ideal solution
+for g in range(105):  # no of generations, exact number of generationsneeded for ideal solution
     candidate = mutate(best_bits)   #mutated version of the current best configuration
     score = fitness(candidate)  #evaluate fitness of mutated
     if score > best_score: ## if better then   update the best configuration and score
         best_bits = candidate
         best_score = score
 print("Original Bit String:", bit_string)
-print("Number of Generations: ", i)
+print("Number of Generations: ", g)
 print("Optimized Bit String:", best_bits)
 print("Maximized 1s in B1 B2, Minimized in G1 & G2")
