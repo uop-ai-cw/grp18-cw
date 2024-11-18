@@ -12,7 +12,6 @@ def i_pop(size, chromosome):
         pop.append(rd.choices(range(2), k=chromosome))
     return pop
 
-
 def fitness_f(bits):
     B1 = bits[:8]
     B2 = bits[24:]
@@ -35,7 +34,6 @@ def mutate(chromo):
             chromo = chromo[:idx] + [1 - chromo[idx]] + chromo[idx + 1 :]
     return chromo
 
-
 def mating_crossover(parent_a, parent_b):
     offspring = []
     cut_point = rd.randint(1, len(parent_a) - 1)
@@ -51,14 +49,18 @@ def main():
     chromosome = 32
 
     population = i_pop(size, chromosome)
+    initial_population = population
     no_generations = 0
 
     for generation in range(generations):
         new_population = []
         fitness_arr = list(map(fitness_f, population))
+        best_individual = max(fitness_arr) 
+        i_best_individual = fitness_arr.index(best_individual)
         sorted_fitness = sorted(fitness_arr)
+        print(f"Best individual in this generation.\n*************** \nFitness: {sorted_fitness[-1]}  \nIndividual Chromosome: {population[i_best_individual]} \n***************")
         if sorted_fitness[-1] > 30:
-            print("A good solution found with a fitness score of", sorted_fitness[-1], "in", generation,"generations")
+            print(f"A good solution found with a fitness score of {sorted_fitness[-1]} in {generation} generations")
             print("************")
             no_generations = generation
             break
@@ -71,16 +73,18 @@ def main():
                 new_population.extend([mutate(child) for child in offspring])
             else:
                 new_population.extend((parent_a, parent_b))
-
+        
         population = new_population
         no_generations = generation
-        
+    
+    initial_fitness = list(map(fitness_f, initial_population))
     fitness_all = list(map(fitness_f, population))
     best_individual = max(fitness_all) 
     i_best_individual = fitness_all.index(best_individual)
     print("Original Bit String:", bit_string)
     print("**********************")
-    print("Fitness of each individuals in population", fitness_all)
+    print("Fitness of each individuals in population (INITIAL GENERATION)", initial_fitness)
+    print("Fitness of each individuals in population (LAST GENERATION)", fitness_all)
     print("Number of Generations: ", no_generations)
     print("String of best individual in last generation", population[i_best_individual])
     print("Optimized Bit fitness:", best_individual)
