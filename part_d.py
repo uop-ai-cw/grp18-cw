@@ -108,7 +108,7 @@ class Full_NN(object):
         msq = np.average((t - output) ** 2)
         return msq
 
-def normalize_data(data, feature_min, feature_max):
+def normalise_data(data, feature_min, feature_max):
     return (data - feature_min) / (feature_max - feature_min)
 
 def parse_csv(csv_path):
@@ -122,7 +122,7 @@ def parse_csv(csv_path):
     # Data processing, need to normalise data 
     input_keys = ["carat","cut","color","clarity","depth","table","x","y","z"]
     cut_mapping = {"Fair": 1.0, "Good": 2.0, "Very Good": 3.0, "Premium": 4.0, "Ideal": 5.0}
-    color_mapping = {"D": 1.0, "E": 2.0, "F": 3.0, "G": 4.0, "H": 5.0, "I": 6.0, "J": 7.0}
+    color_mapping = {"D": 7.0, "E": 6.0, "F": 5.0, "G": 4.0, "H": 3.0, "I": 2.0, "J": 1.0}
     clarity_mapping = {
         "I1": 1.0,
         "SI2": 2.0,
@@ -135,16 +135,16 @@ def parse_csv(csv_path):
     }
 
     for element in data:
-        element["carat"] = float(element["carat"])
-        element["cut"] = cut_mapping[element["cut"]]
-        element["color"] = color_mapping[element["color"]]
-        element["clarity"] = clarity_mapping[element["clarity"]]
-        element["depth"] = float(element["depth"])
-        element["table"] = float(element["table"])
-        element["x"] = float(element["x"])
-        element["y"] = float(element["y"])
-        element["z"] = float(element["z"])
-        element["price"] = float(element["price"])
+        element["carat"] = normalise_data(float(element["carat"]), 0.2, 5.01)
+        element["cut"] = normalise_data(cut_mapping[element["cut"]], 1.0, 5.0)
+        element["color"] = normalise_data(color_mapping[element["color"]], 1.0, 5.0)
+        element["clarity"] = normalise_data(clarity_mapping[element["clarity"]], 1.0, 8.0)
+        element["depth"] = normalise_data(float(element["depth"]), 43, 79)
+        element["table"] = normalise_data(float(element["table"]),42, 95)
+        element["x"] = normalise_data(float(element["x"]), 0, 10.74)
+        element["y"] = normalise_data(float(element["y"]), 0, 58.9)
+        element["z"] = normalise_data(float(element["z"]), 0, 31.8)
+        element["price"] = normalise_data(float(element["price"]), 326, 18823)
         training_inputs.append([element.get(input_key) for input_key in input_keys])
         training_targets.append(element.get("price"))
     
