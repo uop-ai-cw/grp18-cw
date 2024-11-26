@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 
 class SimpleNeuralNetwork:
     def __init__(self, input_size, hidden_size, output_size):
-        # Initialize weights with small random values
         self.w1 = np.random.randn(input_size, hidden_size) * 0.1
         self.b1 = np.zeros((1, hidden_size))
         self.w2 = np.random.randn(hidden_size, output_size) * 0.1
@@ -18,18 +17,15 @@ class SimpleNeuralNetwork:
         return x * (1 - x)
     
     def forward(self, x):
-        # Forward propagation
         self.layer1 = self.sigmoid(np.dot(x, self.w1) + self.b1)
         self.output = np.dot(self.layer1, self.w2) + self.b2
         return self.output
     
     def train(self, x, y, learning_rate=0.01, epochs=1000):
         for _ in range(epochs):
-            # Forward propagation
             layer1 = self.sigmoid(np.dot(x, self.w1) + self.b1)
             output = np.dot(layer1, self.w2) + self.b2
             
-            # Backward propagation
             output_error = y - output
             output_delta = output_error
             
