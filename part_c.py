@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-
 class SimpleNeuralNetwork:
     def __init__(self, input_size, hidden_size, output_size):
         # Initializing weights with small random values
@@ -60,7 +59,7 @@ plt.ylabel('y')
 plt.title('Neural Network Function Approximation')
 plt.legend()
 plt.grid(True)
-plt.show()
+plt.savefig("part_c_plot.png")
 
 # Testing with some sample points
 test_points = np.array([-1, 0, 1, 2]).reshape(-1, 1)
