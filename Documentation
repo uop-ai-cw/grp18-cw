@@ -4,3 +4,6 @@ Based on the perceptron learning concepts with the following components:
 - Sigmoid activation function for non linearity
 - Gradient descent learning
 - Mean squared error loss function
+
+Should we add another hidden layer?
+Should we test on wider range of data points?
