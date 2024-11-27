@@ -1,0 +1,6 @@
+Neural network Implementation for Function Approximation: y = 3x + 0.7x^2
+Based on the perceptron learning concepts with the following components:
+- Single hidden layer architecture
+- Sigmoid activation function for non linearity
+- Gradient descent learning
+- Mean squared error loss function
