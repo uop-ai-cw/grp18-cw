@@ -5,7 +5,7 @@ import numpy as np
 class Full_NN(object):
     #A Multi Layer Neural Network class. We use this as for the way we need to handle the
     #variables is better suited.
-    def __init__(self, X=9, HL=[9,9,9,9,9], Y=2): #a constructor for some default values.
+    def __init__(self, X, HL, Y=2): #a constructor for some default values.
         self.X=X #inputs
         self.HL=HL #hidden layers
         self.Y=Y #outputs
@@ -89,6 +89,8 @@ class Full_NN(object):
                 self.GD(lr) #Do gradient descent
                 
                 S_errors += self.msqe(t,output) # updates the overall error to show the user
+                                
+            print(f"Epoch {i + 1}, Loss: {S_errors / len(x)}")
     
     def GD(self, lr=0.05): #Gradient descent
         for i in range(len(self.W)): # go through the weights
@@ -104,9 +106,9 @@ class Full_NN(object):
         sig_der = x * (1.0 - x)
         return sig_der
     
-    def msqe(self, t, output): # mean square error
-        msq = np.average((t - output) ** 2)
-        return msq
+    def msqe(self, t, output): # mean square error, gonna try MAE
+        # return np.average((t - output) ** 2)
+        return np.mean(np.abs(t - output))
 
 def normalise_data(data, feature_min, feature_max):
     return (data - feature_min) / (feature_max - feature_min)
@@ -139,12 +141,12 @@ def parse_csv(csv_path):
         element["cut"] = normalise_data(cut_mapping[element["cut"]], 1.0, 5.0)
         element["color"] = normalise_data(color_mapping[element["color"]], 1.0, 5.0)
         element["clarity"] = normalise_data(clarity_mapping[element["clarity"]], 1.0, 8.0)
-        element["depth"] = normalise_data(float(element["depth"]), 43, 79)
-        element["table"] = normalise_data(float(element["table"]),42, 95)
+        element["depth"] = normalise_data(float(element["depth"]), 43.0, 79.0)
+        element["table"] = normalise_data(float(element["table"]),42.0, 95.0)
         element["x"] = normalise_data(float(element["x"]), 0, 10.74)
         element["y"] = normalise_data(float(element["y"]), 0, 58.9)
         element["z"] = normalise_data(float(element["z"]), 0, 31.8)
-        element["price"] = normalise_data(float(element["price"]), 326, 18823)
+        element["price"] = normalise_data(float(element["price"]), 326.0, 18823.0)
         training_inputs.append([element.get(input_key) for input_key in input_keys])
         training_targets.append(element.get("price"))
     
@@ -157,20 +159,44 @@ if __name__ == "__main__": # Testing class
     training_data = parse_csv("M33174_CWK_Data_set.csv")
     training_inputs, training_targets = training_data[0], training_data[1]
     # print(training_inputs, training_targets)
+    
+    split_ratio = 0.001
+    train_size = int(training_inputs.shape[0] * split_ratio)
+    input_test, input_train = training_inputs[:train_size], training_inputs[train_size:]
+    target_test, target_train = training_targets[:train_size], training_targets[train_size:]
 
-    nn = Full_NN(9, [9,9,9,9,9], 1) # Creates a NN with 9 inputs, 2 hidden layers and 1 output
-    nn.train_nn(training_inputs, training_targets, 10, 0.1) # Train network with 0.1 learning rate for 10 epochs
+    nn = Full_NN(9, [128,64,32,16], 1) # Creates a NN with 9 inputs, 2 hidden layers and 1 output
+    nn.train_nn(input_train, target_train, 100, 0.01) # Train network with 0.1 learning rate for 10 epochs
     
-    input = [0.23,3.0,3.0,5.0,60.0,57.0,4.0,4.03,2.41] # After training this tests the train network
+    """ input = np.array([normalise_data(0.23, 0.2, 5.01),
+             normalise_data(5.0, 1.0, 5.0),
+             normalise_data(6.0, 1.0, 5.0),
+             normalise_data(2.0, 1.0, 8.0),
+             normalise_data(61.5, 43.0, 79.0),
+             normalise_data(55.0,42.0, 95.0),
+             normalise_data(3.95, 0, 10.74),
+             normalise_data(3.98, 0, 58.9),
+             normalise_data(2.43, 0, 31.8)
+             ])  """# After training this tests the train network
     
-    target = 402.0 # Target value
+    test_inputs = np.array(input_test)
+    test_targets = np.array(target_test)
     
-    NN_output = nn.FF(input)
+    target = np.array(normalise_data(326.0, 326.0, 18823.0)) # Target value
+    target_real = (target * (18823 - 326)) + 326
     
-    print("=============== Testing the Network Screen Output===============")
-    print ("Test input is ", input)
-    print()
-    print("Target output is ", target)
-    print()
-    print("Neural Network actual output is ",NN_output, "there is an error (not MSQE) of ",target-NN_output, "Actual = ", target)
+    """ test_outputs = []
+    for i in range(len(input_test) - 1):
+        formatted = np.array(input_test[i])
+        output = nn.FF(formatted).item()
+        print(formatted,output)
+    print(test_outputs) """
+    
+    NN_output = nn.FF(input_test[4])
+    print(NN_output, target_test[4])
+    
+    """ print("=============== Testing the Network Screen Output===============")
+    for i in range(len(input_train)-1):
+        print(f"Input: {input_test[i]}, Target: {target_test[i]}")
     print("=================================================================")
+    print(len(input_train), len(input_test)) """
