@@ -3,69 +3,88 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-class SimpleNeuralNetwork:
-    def __init__(self, input_size, hidden_size, output_size):
-        self.w1 = np.random.randn(input_size, hidden_size) * 0.1
-        self.b1 = np.zeros((1, hidden_size))
-        self.w2 = np.random.randn(hidden_size, output_size) * 0.1
-        self.b2 = np.zeros((1, output_size))
-    
-    def sigmoid(self, x):
-        return 1 / (1 + np.exp(-x))
-    
-    def sigmoid_derivative(self, x):
-        return x * (1 - x)
-    
-    def forward(self, x):
-        self.layer1 = self.sigmoid(np.dot(x, self.w1) + self.b1)
-        self.output = np.dot(self.layer1, self.w2) + self.b2
-        return self.output
-    
-    def train(self, x, y, learning_rate=0.01, epochs=1000):
-        for _ in range(epochs):
-            layer1 = self.sigmoid(np.dot(x, self.w1) + self.b1)
-            output = np.dot(layer1, self.w2) + self.b2
-            
-            output_error = y - output
-            output_delta = output_error
-            
-            layer1_error = np.dot(output_delta, self.w2.T)
-            layer1_delta = layer1_error * self.sigmoid_derivative(layer1)
-            
-            # Update weights and biases
-            self.w2 += learning_rate * np.dot(layer1.T, output_delta)
-            self.b2 += learning_rate * np.sum(output_delta, axis=0, keepdims=True)
-            self.w1 += learning_rate * np.dot(x.T, layer1_delta)
-            self.b1 += learning_rate * np.sum(layer1_delta, axis=0, keepdims=True)
-
-# Generate training data
-x = np.linspace(-2, 2, 100).reshape(-1, 1)
+# Create data
+x = np.linspace(-10, 10, 1000).reshape(-1, 1)
 y = 3 * x + 0.7 * x**2
 
-# Create and train the neural network
-nn = SimpleNeuralNetwork(input_size=1, hidden_size=5, output_size=1)
-nn.train(x, y, learning_rate=0.01, epochs=2000)
+# Define neural network
+def nn(x):
+    return np.maximum(0, x)
 
-# Generate predictions
-predictions = nn.forward(x)
+def forward(x, w1, b1, w2, b2, w3, b3):
+    z1 = np.dot(x, w1) + b1
+    a1 = nn(z1)
+    z2 = np.dot(a1, w2) + b2
+    a2 = nn(z2)
+    z3 = np.dot(a2, w3) + b3
+    return z3, z1, a1, z2, a2 
+
+# Initialise weights and biases
+np.random.seed(42)
+w1 = np.random.randn(1, 32)
+b1 = np.zeros((1, 32))
+w2 = np.random.randn(32, 32)
+b2 = np.zeros((1, 32))
+w3 = np.random.randn(32, 1)
+b3 = np.zeros((1, 1))
+
+# Training the model
+learning_rate = 0.0001
+epochs = 1000
+
+for epoch in range(epochs):
+    y_pred, z1, a1, z2, a2 = forward(x, w1, b1, w2, b2, w3, b3)
+    
+    loss = np.mean((y_pred - y)**2)
+    
+    # Backpropagation
+    grad_loss = 2 * (y_pred - y) / len(x) 
+    
+    # Gradients for Layer 3
+    grad_w3 = np.dot(a2.T, grad_loss)
+    grad_b3 = np.sum(grad_loss, axis=0, keepdims=True)
+    grad_a2 = np.dot(grad_loss, w3.T)
+    
+    # Gradients for Layer 2
+    grad_z2 = grad_a2 * (z2 > 0) 
+    grad_w2 = np.dot(a1.T, grad_z2)
+    grad_b2 = np.sum(grad_z2, axis=0, keepdims=True)
+    grad_a1 = np.dot(grad_z2, w2.T)
+    
+    # Gradients for Layer 1
+    grad_z1 = grad_a1 * (z1 > 0) 
+    grad_w1 = np.dot(x.T, grad_z1)
+    grad_b1 = np.sum(grad_z1, axis=0, keepdims=True)
+    
+    # Update weights and biases
+    w3 -= learning_rate * grad_w3
+    b3 -= learning_rate * grad_b3
+    w2 -= learning_rate * grad_w2
+    b2 -= learning_rate * grad_b2
+    w1 -= learning_rate * grad_w1
+    b1 -= learning_rate * grad_b1
+    
+    # Print loss every 100 epochs
+    if epoch % 100 == 0:
+        print(f"Epoch {epoch}, Loss: {loss}")
+
+# Test the model
+x_test = np.linspace(-12, 12, 200).reshape(-1, 1)
+y_test = 3 * x_test + 0.7 * x_test**2
+y_pred, _, _, _, _ = forward(x_test, w1, b1, w2, b2, w3, b3)
+
+# Print error
+mse = np.mean((y_test - y_pred)**2)
+print(f"Mean Squared Error: {mse}")
 
 # Plot results
-plt.figure(figsize=(10, 6))
-plt.plot(x, y, label='Actual Function (y=3x+0.7xÂ²)', color='blue')
-plt.plot(x, predictions, label='Neural Network Prediction', color='red', linestyle='--')
+plt.figure(figsize=(8, 6))
+plt.scatter(x, y, color='blue', alpha=0.1, label='Data')
+plt.plot(x_test, y_test, color='green', label='True function')
+plt.plot(x_test, y_pred, color='red', label='Neural Network')
+plt.legend()
+plt.title('Neural Network for y = 3x + 0.7x^2')
 plt.xlabel('x')
 plt.ylabel('y')
-plt.title('Neural Network Function Approximation')
-plt.legend()
-plt.grid(True)
 plt.show()
-
-# Test the network with some sample points
-test_points = np.array([-1, 0, 1, 2]).reshape(-1, 1)
-print("\nTest Points Comparison:")
-print("x\t\tActual\t\tPredicted")
-print("-" * 40)
-for x_test in test_points:
-    actual = float(3 * x_test + 0.7 * x_test**2)
-    predicted = float(nn.forward(x_test.reshape(1, -1)))
-    print(f"{x_test[0]:.1f}\t\t{actual:.3f}\t\t{predicted:.3f}")
+    
