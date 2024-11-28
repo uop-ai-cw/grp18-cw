@@ -29,9 +29,12 @@ def tournament_selection(population, tournament_size=3):
     return max(tournament, key=fitness_f)
 
 def mutate(chromo):
+    original_chromo = chromo.copy() #save the original chromosome before mutation
     for idx in range(len(chromo)):
+
         if rd.random() < 0.08:
             chromo = chromo[:idx] + [1 - chromo[idx]] + chromo[idx + 1 :]
+            print(f"Mutation occurred at index {idx}: {original_chromo} -> {chromo}")
     return chromo
 
 def mating_crossover(parent_a, parent_b):
@@ -41,6 +44,7 @@ def mating_crossover(parent_a, parent_b):
     offspring.append(parent_a[:cut_point] + parent_b[cut_point:])
     offspring.append(parent_b[:cut_point] + parent_a[cut_point:])
 
+    print(f"Crossover between:\nParent A: {parent_a}\nParent B: {parent_b}\nCut Point: {cut_point}\nOffspring: {offspring}")
     return offspring
 
 def main():
