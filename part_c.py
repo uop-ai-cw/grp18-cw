@@ -19,7 +19,7 @@ def forward(x, w1, b1, w2, b2, w3, b3):
     z3 = np.dot(a2, w3) + b3
     return z3, z1, a1, z2, a2 
 
-# Initialise weights and biases
+# Initialising weights and biases
 np.random.seed(42)
 w1 = np.random.randn(1, 32)
 b1 = np.zeros((1, 32))
