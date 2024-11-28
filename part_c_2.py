@@ -30,7 +30,7 @@ b3 = np.zeros((1, 1))
 
 # Training the model
 learning_rate = 0.0001
-epochs = 1000
+epochs = 2000
 
 for epoch in range(epochs):
     y_pred, z1, a1, z2, a2 = forward(x, w1, b1, w2, b2, w3, b3)
