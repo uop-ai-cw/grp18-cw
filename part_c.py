@@ -79,7 +79,6 @@ print(f"Mean Squared Error: {mse}")
 
 # Plot results
 plt.figure(figsize=(8, 6))
-plt.scatter(x, y, color='blue', alpha=0.1, label='Data')
 plt.plot(x_test, y_test, color='green', label='True function')
 plt.plot(x_test, y_pred, color='red', label='Neural Network')
 plt.legend()
