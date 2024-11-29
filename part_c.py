@@ -31,6 +31,7 @@ b3 = np.zeros((1, 1))
 # Train the model
 learning_rate = 0.0001
 epochs = 1000
+error_after_training = []
 
 for epoch in range(epochs):
     y_pred, z1, a1, z2, a2 = forward(x, w1, b1, w2, b2, w3, b3)
@@ -64,9 +65,20 @@ for epoch in range(epochs):
     w1 -= learning_rate * grad_w1
     b1 -= learning_rate * grad_b1
     
+    error_after_training.append(loss)
     # Print loss every 100 epochs
     if epoch % 100 == 0:
         print(f"Epoch {epoch}, Loss: {loss}")
+
+plt.figure(figsize=(8, 6))
+plt.plot(range(1, len(error_after_training) + 1), error_after_training, marker='o', label="MSQE")
+plt.title("Average MSQE Over Epochs")
+plt.xlabel("Epoch")
+plt.ylabel("Error")
+plt.grid(True)
+plt.legend()
+plt.savefig("part_c_error_plot.png")
+plt.show()
 
 # Test the model
 x_test = np.linspace(-12, 12, 200).reshape(-1, 1)
