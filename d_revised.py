@@ -1,9 +1,8 @@
 import numpy as np
 import csv
-
-
+import matplotlib.pyplot as plt
 class Full_NN(object):
-    def __init__(self, X=9, HL=[9, 9, 9, 9, 9], Y=1):
+    def __init__(self, X, HL, Y):
         self.X = X
         self.HL = HL
         self.Y = Y
@@ -16,8 +15,8 @@ class Full_NN(object):
         for i in range(len(L) - 1):  # we want to be able go to the next layer up so we set one minus
             w = np.random.rand(L[i], L[i + 1])  # fill them up with random values, that is why we need the numpy library
             W.append(w)  # add the new values to the array.
-            self.W = W  # link the class variable to the current variable
-
+        self.W = W  # link the class variable to the current variable    
+        
         # initialize a derivative array. This are needed to calculate the
         # back propagation. they are the derivatives of the activation function
         Der = []
@@ -41,7 +40,7 @@ class Full_NN(object):
             self.out[i + 1] = out
         return out
 
-    def BP(self, Er):
+    def BP(self, Er, lr):
         for i in reversed(range(len(self.Der))):
             out = self.out[i + 1]
             D = Er * self.relu_Der(out)
@@ -49,23 +48,38 @@ class Full_NN(object):
             this_out = self.out[i].reshape(self.out[i].shape[0], -1)
             self.Der[i] = np.dot(this_out, D_fixed)
             Er = np.dot(D, self.W[i].T)
+        
+        for i in range(len(self.W)):
+            self.W[i] += self.Der[i] * lr
 
     def train_nn(self, x, target, epochs, lr):
+        msqe = []
         for i in range(epochs):
             S_errors = 0
+            
+            """ if i % 5 == 0:
+                for j, sample in enumerate(x[:5]):
+                    print("Sample: ", sample, "Output: ", nn.FF(sample), "Target: ", target[j]) """
+            
             for j, input in enumerate(x):
                 t = target[j]
                 output = self.FF(input)
                 e = t - output
-                self.BP(e)
-                self.GD(lr)
+                self.BP(e,lr)
                 S_errors += self.msqe(t, output)
-
-    def GD(self, lr=0.05):  # Gradient descent
-        for i in range(len(self.W)):  # go through the weights
-            W = self.W[i]
-            Der = self.Der[i]
-            W += Der * lr  # update the weights by applying the learning rate
+            
+            """ print(f"Epoch {i + 1}, Loss: {S_errors}")
+            msqe.append(S_errors)
+        
+        plt.figure(figsize=(8, 6))
+        plt.plot(range(1, len(msqe) + 1), msqe, marker='o', label="MSQE")
+        plt.title("Mean Absolute Error Over Epochs")
+        plt.xlabel("Epoch")
+        plt.ylabel("MSQE")
+        plt.grid(True)
+        plt.legend()
+        plt.savefig("part_d_error_plot.png")
+        plt.show() """
 
     def relu(self, x):
         return np.maximum(0, x)
@@ -76,14 +90,11 @@ class Full_NN(object):
     def msqe(self, t, output):
         return np.average((t - output) ** 2)
 
-
 def normalise_data(data, min_value, max_value):
     return (data - min_value) / (max_value - min_value)
 
-
 def denormalise_data(data, min_value, max_value):
     return data * (max_value - min_value) + min_value
-
 
 def parse_csv(csv_path):
     training_inputs = []
@@ -117,28 +128,41 @@ def parse_csv(csv_path):
 
     return training_inputs, training_targets, 326, 18823  # return min and max prices
 
-
 if __name__ == "__main__":
+    # Training data
     training_data = parse_csv("M33174_CWK_Data_set.csv")
     training_inputs, training_targets, price_min, price_max = training_data
 
-    nn = Full_NN(9, [9, 9, 9, 9, 9], 1)
-    nn.train_nn(training_inputs, training_targets, 10, 0.1)
+    # Testing data - 100 values
+    testing_data = parse_csv("testdata.csv")
+    testing_input, testing_target, price_min, price_max = testing_data    
+    
+    nn = Full_NN(9, [64, 32, 16, 8], 1)
+    nn.train_nn(training_inputs, training_targets, 10, 0.005)
 
     input = [0.23, 3.0, 3.0, 5.0, 60.0, 57.0, 4.0, 4.03, 2.41]
+    input2 = testing_input[1]
     target = 402.0
-
-    NN_output = nn.FF(input)
+    
+    nn_output_normalised = []
+    nn_output_real = []
+    
+    # for test_input in testing_input:
+    NN_output = nn.FF(input2)
+    # nn_output_normalised.append(NN_output)
     NN_output = denormalise_data(NN_output, price_min, price_max)
+    # nn_output_real.append(NN_output)
 
-    print("=============== Testing the Network Screen Output===============")
+    print(NN_output)
+
+    """ print("=============== Testing the Network Screen Output===============")
     print("Test input is ", input)
     print()
     print("Target output is ", target)
     print()
     print("Neural Network actual output is ", NN_output, "there is an error (not MSQE) of ", target - NN_output,
           "Actual = ", target)
-    print("=================================================================")
+    print("=================================================================") """
 
     ##### from the origianl code you sent me, i changed some variable names as it was hard for me to rememeber and removed some comments cos it was had to read aroumnd code
 
